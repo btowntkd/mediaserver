@@ -16,7 +16,7 @@ services:
       - ${APPDATA_PATH}/sonarr:/config
       - ${DOWNLOADS_PATH}/TV:/downloads
       - ${TV_PATH}:/tv
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=${TZ}
       - PUID=${PUID}
@@ -35,7 +35,7 @@ services:
       - ${APPDATA_PATH}/radarr:/config
       - ${DOWNLOADS_PATH}/Movies:/downloads
       - ${MOVIES_PATH}:/movies
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=${TZ}
       - PUID=${PUID}
@@ -50,7 +50,7 @@ services:
     volumes:
       - ${APPDATA_PATH}/jackett/config:/config
       - ${APPDATA_PATH}/jackett/data:/downloads
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=${TZ}
       - PUID=${PUID}
@@ -65,7 +65,7 @@ services:
     volumes:
       - ${APPDATA_PATH}/deluge:/config
       - ${DOWNLOADS_PATH}:/downloads
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=${TZ}
       - PUID=${PUID}
@@ -80,7 +80,7 @@ services:
     volumes:
       - ${APPDATA_PATH}/nzbget:/config
       - ${DOWNLOADS_PATH}:/downloads
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=${TZ}
       - PUID=${PUID}
@@ -94,7 +94,7 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun
-    restart: always
+    restart: unless-stopped
     ports:
       - 8989:8989 # Sonarr port
       - 7878:7878 # Radarr port
@@ -112,7 +112,7 @@ services:
   nginx:
     image: dperson/nginx
     container_name: nginx
-    restart: always
+    restart: unless-stopped
     depends_on: 
       - vpn
     volumes:
