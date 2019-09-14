@@ -110,16 +110,18 @@ services:
       - PROTOCOL=openvpn_udp
   
   nginx:
-    image: dperson/nginx
+    image: nginx
     container_name: nginx
     restart: unless-stopped
     depends_on: 
       - vpn
     volumes:
-      - ${APPDATA_PATH}/nginx/www:/srv/www:ro
-      - ${APPDATA_PATH}/nginx/ssl:/etc/nginx/ssl
-      - ${APPDATA_PATH}/nginx/conf:/etc/nginx/conf.d/
-      - ${APPDATA_PATH}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${APPDATA_PATH}/nginx/html:/usr/share/nginx/html:ro       # Place static HTML here
+      - ${APPDATA_PATH}/nginx/certs:/etc/nginx/certs:ro           # Place SSL certs here
+      - ${APPDATA_PATH}/nginx/conf:/etc/nginx/conf:ro             # Place additional config files (htpassword, etc.) here
+      - ${APPDATA_PATH}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro # Place nginx.conf file here
+      - ${APPDATA_PATH}/nginx/logs:/etc/nginx/logs                # Direct log files here
+      
     ports:
       - 80:80
       - 443:443
