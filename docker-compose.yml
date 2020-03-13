@@ -4,7 +4,7 @@ version: '3'
 services:
 
   sonarr:
-    image: linuxserver/sonarr
+    image: linuxserver/sonarr:preview
     container_name: sonarr
     network_mode: service:vpn
     depends_on:
@@ -14,7 +14,7 @@ services:
       - vpn
     volumes:
       - ${APPDATA_PATH}/sonarr:/config
-      - ${DOWNLOADS_PATH}/TV:/downloads
+      - ${DOWNLOADS_PATH}/Complete/TV:/downloads
       - ${TV_PATH}:/tv
     restart: unless-stopped
     environment:
@@ -23,7 +23,7 @@ services:
       - PGID=${PGID}
 
   radarr:
-    image: linuxserver/radarr
+    image: linuxserver/radarr:preview
     container_name: radarr
     network_mode: service:vpn
     depends_on:
@@ -33,8 +33,27 @@ services:
       - vpn
     volumes:
       - ${APPDATA_PATH}/radarr:/config
-      - ${DOWNLOADS_PATH}/Movies:/downloads
+      - ${DOWNLOADS_PATH}/Complete/Movies:/downloads
       - ${MOVIES_PATH}:/movies
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      
+  lidarr:
+    image: linuxserver/lidarr
+    container_name: lidarr
+    network_mode: service:vpn
+    depends_on:
+      - nzbget
+      - deluge
+      - jackett
+      - vpn
+    volumes:
+      - ${APPDATA_PATH}/lidarr:/config
+      - ${DOWNLOADS_PATH}/Complete/Music:/downloads
+      - ${MUSIC_PATH}:/music
     restart: unless-stopped
     environment:
       - TZ=${TZ}
@@ -98,6 +117,7 @@ services:
     ports:
       - 8989:8989 # Sonarr port
       - 7878:7878 # Radarr port
+      - 8686:8686 # Lidarr port
       - 9117:9117 # Jackett port
       - 8112:8112 # Torrent UI port
       - 6789:6789 # NZB UI port
@@ -113,15 +133,22 @@ services:
     image: nginx
     container_name: nginx
     restart: unless-stopped
-    depends_on: 
+    depends_on:
       - vpn
     volumes:
       - ${APPDATA_PATH}/nginx/html:/usr/share/nginx/html:ro       # Place static HTML here
-      - ${APPDATA_PATH}/nginx/certs:/etc/nginx/certs:ro           # Place SSL certs here
+      - ${APPDATA_PATH}/certbot/html:/var/www/certbot:ro          # Place certbot HTML here
+      - ${APPDATA_PATH}/certbot/conf:/etc/letsencrypt:ro          # Place SSL certs here
       - ${APPDATA_PATH}/nginx/conf:/etc/nginx/conf:ro             # Place additional config files (htpassword, etc.) here
       - ${APPDATA_PATH}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro # Place nginx.conf file here
       - ${APPDATA_PATH}/nginx/logs:/etc/nginx/logs                # Direct log files here
-      
+    links:
+      - vpn:sonarr
+      - vpn:radarr
+      - vpn:lidarr
+      - vpn:jackett
+      - vpn:deluge
+      - vpn:nzbget
     ports:
       - 80:80
       - 443:443
