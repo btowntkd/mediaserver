@@ -14,6 +14,9 @@ services:
       - ${APPDATA_PATH}/sonarr:/config
       - ${DOWNLOADS_PATH}/Complete/TV:/downloads
       - ${TV_PATH}:/tv
+    links:
+    - vpn:jackett
+    - vpn:deluge
     restart: unless-stopped
     environment:
       - TZ=${TZ}
@@ -31,6 +34,9 @@ services:
       - ${APPDATA_PATH}/radarr:/config
       - ${DOWNLOADS_PATH}/Complete/Movies:/downloads
       - ${MOVIES_PATH}:/movies
+    links:
+    - vpn:jackett
+    - vpn:deluge
     restart: unless-stopped
     environment:
       - TZ=${TZ}
@@ -48,6 +54,9 @@ services:
       - ${APPDATA_PATH}/lidarr:/config
       - ${DOWNLOADS_PATH}/Complete/Music:/downloads
       - ${MUSIC_PATH}:/music
+    links:
+    - vpn:jackett
+    - vpn:deluge
     restart: unless-stopped
     environment:
       - TZ=${TZ}
